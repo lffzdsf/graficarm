@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#071b31">
+  <title>Central de Produção — Raphael Mota 2026</title>
+  <meta name="description" content="Gestão de materiais gráficos da campanha Raphael Mota 2026">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">RM</div>
+      <div><strong>RAPHAEL MOTA</strong><span>Central de Produção 2026</span></div>
+    </div>
+    <nav>
+      <button class="nav-item active" data-view="dashboard"><span>⌂</span> Visão geral</button>
+      <button class="nav-item" data-view="kanban"><span>▦</span> Quadro de produção</button>
+      <button class="nav-item" data-view="library"><span>▤</span> Biblioteca</button>
+      <button class="nav-item" data-view="calendar"><span>□</span> Calendário</button>
+      <button class="nav-item" data-view="suppliers"><span>◇</span> Fornecedores</button>
+    </nav>
+    <div class="sidebar-bottom">
+      <a href="https://drive.google.com/drive/folders/1Z6jiTVZ6UEO6FwlykwjuC4ruQv4icaw-?usp=sharing" target="_blank" rel="noopener">Abrir pasta Workflow ↗</a>
+      <a href="https://docs.google.com/spreadsheets/d/1bDb2u_s19E2JMJd73J_ovP-l59bs5LCRkdNM2YgpJ6c/edit" target="_blank" rel="noopener">Abrir planilha-base ↗</a>
+      <small>Dados salvos neste navegador</small>
+    </div>
+  </aside>
+
+  <main>
+    <header class="topbar">
+      <button class="icon-btn mobile-menu" id="mobileMenu" aria-label="Abrir menu">☰</button>
+      <div>
+        <p class="eyebrow">CAMPANHA RAPHAEL MOTA 2026</p>
+        <h1 id="pageTitle">Visão geral</h1>
+      </div>
+      <div class="top-actions">
+        <label class="search"><span>⌕</span><input id="globalSearch" placeholder="Buscar material, cidade..."></label>
+        <button class="btn primary" id="newDemand">＋ Nova demanda</button>
+      </div>
+    </header>
+
+    <section id="dashboard" class="view active">
+      <div class="hero">
+        <div><span class="live-dot"></span> CENTRAL ATIVA</div>
+        <h2>Produção organizada.<br><em>Campanha em movimento.</em></h2>
+        <p>Acompanhe prazos, aprovações, arquivos e impressão em um único fluxo.</p>
+      </div>
+      <div class="stats" id="stats"></div>
+      <div class="dashboard-grid">
+        <article class="panel">
+          <div class="panel-head"><div><p class="eyebrow">FLUXO ATUAL</p><h3>Demandas por etapa</h3></div><button class="text-btn" data-go="kanban">Ver quadro →</button></div>
+          <div id="statusChart" class="status-chart"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head"><div><p class="eyebrow">ATENÇÃO</p><h3>Prioridades e prazos</h3></div></div>
+          <div id="urgentList" class="urgent-list"></div>
+        </article>
+      </div>
+      <article class="panel recent">
+        <div class="panel-head"><div><p class="eyebrow">PRODUÇÃO</p><h3>Materiais recentes</h3></div><button class="text-btn" data-go="library">Ver biblioteca →</button></div>
+        <div class="table-wrap"><table><thead><tr><th>Material</th><th>Local</th><th>Responsável</th><th>Prazo</th><th>Status</th></tr></thead><tbody id="recentTable"></tbody></table></div>
+      </article>
+    </section>
+
+    <section id="kanban" class="view">
+      <div class="view-toolbar">
+        <div class="filter-group">
+          <select id="filterPriority"><option value="">Todas as prioridades</option><option>Urgente</option><option>Alta</option><option>Média</option><option>Baixa</option></select>
+          <select id="filterCity"><option value="">Todas as cidades</option></select>
+        </div>
+        <p>Arraste os cards para atualizar a etapa</p>
+      </div>
+      <div id="kanbanBoard" class="kanban-board"></div>
+    </section>
+
+    <section id="library" class="view">
+      <div class="view-toolbar"><div class="filter-group"><select id="filterCategory"><option value="">Todas as categorias</option></select><select id="filterStatus"><option value="">Todos os status</option></select></div><span id="libraryCount"></span></div>
+      <div id="libraryGrid" class="library-grid"></div>
+    </section>
+
+    <section id="calendar" class="view">
+      <article class="panel">
+        <div class="panel-head"><div><p class="eyebrow">CRONOGRAMA</p><h3>Agenda de produção e impressão</h3></div></div>
+        <div id="calendarList" class="calendar-list"></div>
+      </article>
+    </section>
+
+    <section id="suppliers" class="view">
+      <div class="empty-state"><div class="empty-icon">◇</div><h2>Fornecedores e gráficas</h2><p>Centralize contatos, orçamentos, prazos e especialidades dos fornecedores.</p><button class="btn secondary" id="supplierInfo">Gerenciar na planilha-base ↗</button></div>
+    </section>
+  </main>
+
+  <div class="modal-backdrop" id="demandModal" hidden>
+    <div class="modal">
+      <div class="modal-head"><div><p class="eyebrow">FICHA DE PRODUÇÃO</p><h2 id="modalTitle">Nova demanda</h2></div><button class="close-btn" data-close>×</button></div>
+      <form id="demandForm">
+        <input type="hidden" id="demandId">
+        <div class="form-grid">
+          <label class="wide">Nome do material<input id="demandName" required placeholder="Ex.: Santinho Montes Claros"></label>
+          <label>Categoria<select id="demandCategory"><option>Impresso</option><option>Adesivo</option><option>Sinalização</option><option>Comitê</option><option>Mobilização</option><option>Digital</option><option>Outros</option></select></label>
+          <label>Cidade / região<input id="demandCity" placeholder="Geral"></label>
+          <label>Prioridade<select id="demandPriority"><option>Média</option><option>Urgente</option><option>Alta</option><option>Baixa</option></select></label>
+          <label>Status<select id="demandStatus"></select></label>
+          <label>Prazo<input id="demandDeadline" type="date"></label>
+          <label>Responsável<input id="demandOwner" placeholder="A definir"></label>
+          <label class="wide">Mensagem / especificação<textarea id="demandNotes" rows="3" placeholder="Texto, formato, tiragem, ajustes..."></textarea></label>
+          <label class="wide">Link do arquivo ou pasta no Drive<input id="demandLink" type="url" placeholder="https://drive.google.com/..."></label>
+          <label class="wide file-drop">Pré-visualizar arquivo<input id="demandFile" type="file" accept="image/*,.pdf"><span>Selecione uma imagem ou PDF para conferir localmente</span><div id="filePreview"></div></label>
+        </div>
+        <fieldset class="checklist">
+          <legend>Checklist para impressão</legend>
+          <label><input type="checkbox" id="checkText"> Texto revisado</label>
+          <label><input type="checkbox" id="checkLegal"> Dados legais conferidos</label>
+          <label><input type="checkbox" id="checkPrint"> CMYK, sangria e resolução</label>
+          <label><input type="checkbox" id="checkApproval"> Aprovação final registrada</label>
+        </fieldset>
+        <div class="form-actions"><button type="button" class="btn danger" id="deleteDemand" hidden>Excluir</button><span></span><button type="button" class="btn ghost" data-close>Cancelar</button><button type="submit" class="btn primary">Salvar demanda</button></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>
