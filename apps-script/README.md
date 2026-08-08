@@ -11,4 +11,4 @@ Esta pasta contém a ponte entre o GitHub Pages e o Google Sheets/Drive.
 7. Autorize o acesso à planilha e ao Drive e copie a URL terminada em `/exec`.
 8. Cole essa URL em `config.js`, no campo `apiUrl`, e publique a alteração.
 
-O Web App permite leitura, criação, atualização e movimentação de demandas. A exclusão pública fica desativada por segurança. Imagens JPG/PNG/WebP e PDFs de até 8 MB são armazenados em `Workflow/Arquivos da Central/<ID>`.
+O Web App permite leitura, criação, atualização, movimentação e remoção confirmada de demandas. Ao remover uma demanda, os arquivos do Drive são preservados. Imagens JPG/PNG/WebP e PDFs de até 8 MB são armazenados em `Workflow/Arquivos da Central/<ID>` e podem ser visualizados na ficha da demanda.

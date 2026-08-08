@@ -96,6 +96,41 @@
     </section>
   </main>
 
+  <div class="modal-backdrop" id="detailModal" hidden>
+    <div class="modal detail-modal">
+      <div class="modal-head">
+        <div><p class="eyebrow">FICHA DA DEMANDA</p><h2 id="detailTitle">Demanda</h2></div>
+        <button class="close-btn" data-close-detail aria-label="Fechar">×</button>
+      </div>
+      <div class="detail-content">
+        <div class="detail-summary">
+          <span id="detailId" class="detail-id"></span>
+          <span id="detailPriority" class="priority"></span>
+          <span id="detailStatus" class="badge"></span>
+        </div>
+        <div id="detailFields" class="detail-grid"></div>
+        <section class="detail-section">
+          <p class="eyebrow">MENSAGEM / ESPECIFICAÇÃO</p>
+          <p id="detailNotes" class="detail-notes"></p>
+        </section>
+        <section class="detail-section">
+          <div class="detail-section-head"><p class="eyebrow">ARQUIVO ANEXADO</p><a id="detailFileLink" class="text-btn" target="_blank" rel="noopener" hidden>Abrir no Drive ↗</a></div>
+          <div id="detailAttachment" class="attachment-view"></div>
+        </section>
+        <section class="detail-section">
+          <p class="eyebrow">CHECKLIST PARA IMPRESSÃO</p>
+          <div id="detailChecklist" class="detail-checklist"></div>
+        </section>
+      </div>
+      <div class="detail-actions">
+        <button type="button" class="btn danger" id="removeDemand">Remover demanda</button>
+        <span></span>
+        <button type="button" class="btn ghost" data-close-detail>Fechar</button>
+        <button type="button" class="btn primary" id="editDemand">Editar demanda</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-backdrop" id="demandModal" hidden>
     <div class="modal">
       <div class="modal-head"><div><p class="eyebrow">FICHA DE PRODUÇÃO</p><h2 id="modalTitle">Nova demanda</h2></div><button class="close-btn" data-close>×</button></div>
@@ -129,6 +164,19 @@
         </fieldset>
         <div class="form-actions"><span></span><span></span><button type="button" class="btn ghost" data-close>Cancelar</button><button type="submit" class="btn primary">Salvar demanda</button></div>
       </form>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="confirmModal" hidden>
+    <div class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+      <div class="confirm-icon">!</div>
+      <h2 id="confirmTitle">Remover esta demanda?</h2>
+      <p id="confirmText">Esta ação removerá a demanda da Central e da planilha.</p>
+      <small>Os arquivos enviados ao Drive serão preservados.</small>
+      <div class="confirm-actions">
+        <button type="button" class="btn ghost" id="cancelRemove">Cancelar</button>
+        <button type="button" class="btn danger-solid" id="confirmRemove">Sim, remover demanda</button>
+      </div>
     </div>
   </div>
 

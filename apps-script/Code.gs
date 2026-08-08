@@ -9,7 +9,7 @@ const SETTINGS = Object.freeze({
 });
 
 function doGet() {
-  return json_({ok: true, service: 'Graficarm API', version: 1});
+  return json_({ok: true, service: 'Graficarm API', version: 2});
 }
 
 function doPost(e) {
@@ -17,7 +17,9 @@ function doPost(e) {
     const action = String(e.parameter.action || 'list');
     const payload = JSON.parse(e.parameter.payload || '{}');
     if (action === 'list') return json_({ok: true, demands: listDemands_()});
+    if (action === 'file') return json_(filePreview_(payload));
     if (action === 'save') return json_(withLock_(() => saveDemand_(payload)));
+    if (action === 'delete') return json_(withLock_(() => deleteDemand_(payload)));
     throw new Error('Ação inválida.');
   } catch (error) {
     return json_({ok: false, error: error.message || String(error)});
@@ -36,15 +38,19 @@ function listDemands_() {
   const lastRow = Math.max(sheet.getLastRow(), 2);
   const rows = sheet.getRange(2, 1, lastRow - 1, 22).getDisplayValues();
   const checks = technicalChecks_(ss);
-  return rows.filter(row => row[1]).map(row => ({
-    id: row[0], name: row[1], category: row[2], city: row[3], format: row[4],
-    priority: row[5], status: row[6], owner: row[7], requester: row[8],
-    createdAt: brDateToIso_(row[9]), deadline: brDateToIso_(row[10]),
-    printDate: brDateToIso_(row[11]), quantity: row[13], supplier: row[14],
-    version: row[15], link: row[16], adjustments: row[17], approvedBy: row[18],
-    approvalDate: brDateToIso_(row[19]), updatedAt: brDateToIso_(row[20]),
-    notes: row[21], checks: checks[row[0]] || emptyChecks_()
-  }));
+  return rows.filter(row => row[1]).map(row => {
+    const link = row[16];
+    return {
+      id: row[0], name: row[1], category: row[2], city: row[3], format: row[4],
+      priority: row[5], status: row[6], owner: row[7], requester: row[8],
+      createdAt: brDateToIso_(row[9]), deadline: brDateToIso_(row[10]),
+      printDate: brDateToIso_(row[11]), quantity: row[13], supplier: row[14],
+      version: row[15], link: link, attachment: attachmentInfo_(link),
+      adjustments: row[17], approvedBy: row[18],
+      approvalDate: brDateToIso_(row[19]), updatedAt: brDateToIso_(row[20]),
+      notes: row[21], checks: checks[row[0]] || emptyChecks_()
+    };
+  });
 }
 
 function saveDemand_(payload) {
@@ -91,6 +97,72 @@ function saveDemand_(payload) {
   SpreadsheetApp.flush();
   const saved = listDemands_().find(item => item.id === id);
   return {ok: true, demand: saved, fileUrl: link};
+}
+
+function deleteDemand_(payload) {
+  const id = clean_(payload.id, 30);
+  if (!id) throw new Error('Informe a demanda que será removida.');
+  const ss = SpreadsheetApp.openById(SETTINGS.spreadsheetId);
+  const sheet = ss.getSheetByName(SETTINGS.demandSheet);
+  const rowNumber = findDemandRow_(sheet, id);
+  if (!rowNumber) throw new Error('A demanda não foi encontrada ou já foi removida.');
+  const row = sheet.getRange(rowNumber, 1, 1, 22).getDisplayValues()[0];
+  const actor = row[8] || row[7] || 'Interface pública';
+  log_(ss, 'REMOVER', id, actor, 'Demanda removida; arquivos do Drive preservados.');
+  sheet.getRange(rowNumber, 1, 1, 12).clearContent();
+  sheet.getRange(rowNumber, 14, 1, 9).clearContent();
+  const technical = ss.getSheetByName(SETTINGS.technicalSheet);
+  const technicalRow = findRowByValue_(technical, 1, id);
+  if (technicalRow) {
+    technical.getRange(technicalRow, 1).clearContent();
+    technical.getRange(technicalRow, 3, 1, 8).clearContent();
+    technical.getRange(technicalRow, 12, 1, 2).clearContent();
+  }
+  SpreadsheetApp.flush();
+  return {ok: true, deletedId: id, filesPreserved: true};
+}
+
+function attachmentInfo_(link) {
+  if (!link) return null;
+  const match = String(link).match(/[-\w]{25,}/);
+  if (!match) return {name: 'Arquivo da demanda', mime: '', url: String(link), previewUrl: String(link), thumbnailUrl: ''};
+  try {
+    const file = DriveApp.getFileById(match[0]);
+    const mime = file.getMimeType();
+    return {
+      id: file.getId(),
+      name: file.getName(),
+      mime: mime,
+      url: file.getUrl(),
+      previewUrl: 'https://drive.google.com/file/d/' + file.getId() + '/preview',
+      thumbnailUrl: mime.indexOf('image/') === 0 ? 'https://drive.google.com/thumbnail?id=' + file.getId() + '&sz=w1200' : ''
+    };
+  } catch (error) {
+    return {name: 'Arquivo da demanda', mime: '', url: String(link), previewUrl: String(link), thumbnailUrl: ''};
+  }
+}
+
+function filePreview_(payload) {
+  const id = clean_(payload.id, 30);
+  if (!id) throw new Error('Informe a demanda do arquivo.');
+  const ss = SpreadsheetApp.openById(SETTINGS.spreadsheetId);
+  const sheet = ss.getSheetByName(SETTINGS.demandSheet);
+  const rowNumber = findDemandRow_(sheet, id);
+  if (!rowNumber) throw new Error('Demanda não encontrada.');
+  const link = sheet.getRange(rowNumber, 17).getDisplayValue();
+  const match = String(link).match(/[-\w]{25,}/);
+  if (!match) throw new Error('Esta demanda não possui um arquivo do Drive para visualizar.');
+  const file = DriveApp.getFileById(match[0]);
+  const mime = file.getMimeType();
+  if (!SETTINGS.allowedMimeTypes.includes(mime)) throw new Error('O arquivo não possui um formato de pré-visualização permitido.');
+  if (file.getSize() > SETTINGS.maxFileBytes) throw new Error('O arquivo excede o limite de pré-visualização de 8 MB.');
+  return {
+    ok: true,
+    name: file.getName(),
+    mime: mime,
+    url: file.getUrl(),
+    base64: Utilities.base64Encode(file.getBlob().getBytes())
+  };
 }
 
 function technicalChecks_(ss) {
