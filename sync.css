@@ -1,0 +1,4 @@
+.sidebar-bottom small[data-state="ok"] { color: #b8df61; }
+.sidebar-bottom small[data-state="loading"] { color: #66daf5; }
+.sidebar-bottom small[data-state="error"] { color: #ff8b91; }
+.sidebar-bottom small[data-state="pending"] { color: #f6c66f; }

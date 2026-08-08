@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="sync.css">
 </head>
 <body>
   <aside class="sidebar" id="sidebar">
@@ -27,7 +28,7 @@
     <div class="sidebar-bottom">
       <a href="https://drive.google.com/drive/folders/1Z6jiTVZ6UEO6FwlykwjuC4ruQv4icaw-?usp=sharing" target="_blank" rel="noopener">Abrir pasta Workflow ↗</a>
       <a href="https://docs.google.com/spreadsheets/d/1bDb2u_s19E2JMJd73J_ovP-l59bs5LCRkdNM2YgpJ6c/edit" target="_blank" rel="noopener">Abrir planilha-base ↗</a>
-      <small>Dados salvos neste navegador</small>
+      <small id="syncStatus">Conectando à Central…</small>
     </div>
   </aside>
 
@@ -102,29 +103,37 @@
         <input type="hidden" id="demandId">
         <div class="form-grid">
           <label class="wide">Nome do material<input id="demandName" required placeholder="Ex.: Santinho Montes Claros"></label>
-          <label>Categoria<select id="demandCategory"><option>Impresso</option><option>Adesivo</option><option>Sinalização</option><option>Comitê</option><option>Mobilização</option><option>Digital</option><option>Outros</option></select></label>
+          <label>Categoria<select id="demandCategory"><option>Impresso</option><option>Digital</option><option>Sinalização</option><option>Brinde</option><option>Adesivagem</option><option>Uniforme</option><option>Apresentação</option><option>Audiovisual</option><option>Outros</option></select></label>
           <label>Cidade / região<input id="demandCity" placeholder="Geral"></label>
           <label>Prioridade<select id="demandPriority"><option>Média</option><option>Urgente</option><option>Alta</option><option>Baixa</option></select></label>
           <label>Status<select id="demandStatus"></select></label>
           <label>Prazo<input id="demandDeadline" type="date"></label>
           <label>Responsável<input id="demandOwner" placeholder="A definir"></label>
+          <label>Solicitante<input id="demandRequester" required placeholder="Seu nome"></label>
+          <label>Formato / medida<input id="demandFormat" placeholder="Ex.: 30 × 30 cm"></label>
+          <label>Tiragem / quantidade<input id="demandQuantity" placeholder="Ex.: 5.000 unidades"></label>
           <label class="wide">Mensagem / especificação<textarea id="demandNotes" rows="3" placeholder="Texto, formato, tiragem, ajustes..."></textarea></label>
           <label class="wide">Link do arquivo ou pasta no Drive<input id="demandLink" type="url" placeholder="https://drive.google.com/..."></label>
-          <label class="wide file-drop">Pré-visualizar arquivo<input id="demandFile" type="file" accept="image/*,.pdf"><span>Selecione uma imagem ou PDF para conferir localmente</span><div id="filePreview"></div></label>
+          <label class="wide file-drop">Anexar ao Drive<input id="demandFile" type="file" accept="image/jpeg,image/png,image/webp,application/pdf"><span>Imagem ou PDF, com até 8 MB</span><div id="filePreview"></div></label>
         </div>
         <fieldset class="checklist">
           <legend>Checklist para impressão</legend>
-          <label><input type="checkbox" id="checkText"> Texto revisado</label>
-          <label><input type="checkbox" id="checkLegal"> Dados legais conferidos</label>
-          <label><input type="checkbox" id="checkPrint"> CMYK, sangria e resolução</label>
-          <label><input type="checkbox" id="checkApproval"> Aprovação final registrada</label>
+          <label><input type="checkbox" id="checkCmyk"> CMYK</label>
+          <label><input type="checkbox" id="checkDpi"> 300 dpi</label>
+          <label><input type="checkbox" id="checkBleed"> Sangria</label>
+          <label><input type="checkbox" id="checkMargin"> Margem de segurança</label>
+          <label><input type="checkbox" id="checkFonts"> Fontes / vetores</label>
+          <label><input type="checkbox" id="checkLegal"> Textos legais</label>
+          <label><input type="checkbox" id="checkPdf"> PDF final</label>
+          <label><input type="checkbox" id="checkProof"> Prova conferida</label>
         </fieldset>
-        <div class="form-actions"><button type="button" class="btn danger" id="deleteDemand" hidden>Excluir</button><span></span><button type="button" class="btn ghost" data-close>Cancelar</button><button type="submit" class="btn primary">Salvar demanda</button></div>
+        <div class="form-actions"><span></span><span></span><button type="button" class="btn ghost" data-close>Cancelar</button><button type="submit" class="btn primary">Salvar demanda</button></div>
       </form>
     </div>
   </div>
 
   <div class="toast" id="toast"></div>
+  <script src="config.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

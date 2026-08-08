@@ -10,13 +10,14 @@ Aplicação web para organizar a produção de materiais gráficos da campanha.
 - Filtros por prioridade, cidade, categoria e status
 - Checklist técnico para impressão
 - Calendário de prazos
-- Pré-visualização local de imagens e PDFs
+- Upload de imagens e PDFs para a pasta Workflow
 - Atalhos para a planilha-base e para a pasta Workflow no Google Drive
-- Persistência das alterações no navegador (localStorage)
+- Sincronização compartilhada com Google Sheets e Drive por Google Apps Script
+- Histórico de ações e checklist técnico integrado
 
 ## Acesso
 
 A publicação é feita automaticamente pelo GitHub Pages:
 https://lffzdsf.github.io/graficarm/
 
-> Nesta versão, os dados operacionais ficam salvos no navegador utilizado. A sincronização multiusuário com Google Sheets/Drive exige uma API autenticada e será implementada em uma etapa posterior.
+Enquanto a API não estiver configurada em `config.js`, a aplicação mantém uma cópia local no navegador. As instruções para publicar a ponte do Google estão em [`apps-script/README.md`](apps-script/README.md).
